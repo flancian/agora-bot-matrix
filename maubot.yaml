@@ -6,10 +6,10 @@
 maubot: 0.1.0
 
 # The unique ID for the plugin. Java package naming style. (i.e. use your own domain, not xyz.maubot)
-id: casavant.tom.reddit
+id: org.anagora.agorabot
 
 # A PEP 440 compliant version string.
-version: 1.4.0
+version: 1.4.1
 
 # The SPDX license identifier for the plugin. https://spdx.org/licenses/
 # Optional, assumes all rights reserved if omitted.
@@ -20,13 +20,13 @@ license: MIT
 # Submodules that are imported by modules listed here don't need to be listed separately.
 # However, top-level modules must always be listed even if they're imported by other modules.
 modules:
-- reddit
+- agora
 
 # The main class of the plugin. Format: module/Class
 # If `module` is omitted, will default to last module specified in the module list.
 # Even if `module` is not omitted here, it must be included in the modules list.
 # The main class must extend maubot.Plugin
-main_class: RedditPlugin
+main_class: AgoraPlugin
 
 # Whether or not instances need a database
 database: false
