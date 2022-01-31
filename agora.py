@@ -2,9 +2,11 @@ from random import choice
 from typing import List, Tuple
 import urllib.parse
 from maubot import Plugin, MessageEvent
+from mautrix.types import RelationType, TextMessageEventContent, RelatesTo, MessageType
 from maubot.handlers import command
 import re
 
+THREAD = RelationType("io.element.thread")
 
 class AgoraPlugin(Plugin):
     @command.passive("\[\[(.+?)\]\]", multiple=True)
@@ -28,4 +30,8 @@ class AgoraPlugin(Plugin):
         if wikilinks:
             wikilinks = f"\n".join(wikilinks)
             response += wikilinks
-            await evt.reply(response, allow_html=True)  # Reply to user
+            content = TextMessageEventContent(
+                    body=response, 
+                    msgtype=MessageType.NOTICE,
+                    relates_to=RelatesTo(rel_type=THREAD, event_id=evt.event_id))
+            await evt.respond(content, allow_html=True)  # Reply to user
