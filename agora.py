@@ -16,6 +16,9 @@ class AgoraPlugin(Plugin):
             if re.match('[0-9a-zA-Z -]+$', link):
                 # prefer slugging simple links
                 link = "https://anagora.org/{}".format(link.replace(' ', '-'))
+            elif 'href=' in link or re.match('\[.+?\]\(.+?\)', link):
+                # this wikilink is already anchored (resolved), skip it.
+                continue
             else:
                 # urlencode otherwise
                 link = "https://anagora.org/{}".format(urllib.parse.quote(link))
