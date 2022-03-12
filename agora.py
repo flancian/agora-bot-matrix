@@ -3,6 +3,7 @@ from typing import List, Tuple
 import urllib.parse
 from maubot import Plugin, MessageEvent
 from mautrix.types import RelationType, TextMessageEventContent, RelatesTo, MessageType
+from mautrix import errors
 from maubot.handlers import command
 import datetime
 import os
@@ -34,7 +35,7 @@ def log_evt(evt, node):
         pass
 
     # unsure if it's OK inlining, perhaps fine in this case as each room does explicit setup?
-    # msg = evt.body
+    msg = evt.content.body
 
     # this was shamelessly copy/pasted and adapted from [[agora bridge]], mastodon bot.
     if ('/' in node):
@@ -50,9 +51,9 @@ def log_evt(evt, node):
             username = evt.sender
             # /1000 needed to reduce 13 -> 10 digits
             dt = datetime.datetime.fromtimestamp(int(evt.timestamp/1000))
-            link = f'{MATRIX_URL}/#/room/{evt.room_id}/{evt.event_id}'
+            link = f'[link]({MATRIX_URL}/#/room/{evt.room_id}/{evt.event_id})'
             # note.write(f"- [[{username}]] at {dt}: {link}\n  - ```{msg}```")
-            note.write(f"- [[{dt}]]\n  - [[{username}]] {link}\n")
+            note.write(f"- [[{dt}]] [[{username}]] ({link}):\n  - {msg}\n")
     except Exception as e:
         print(f"Couldn't save link to message, exception: {e}.")
 
@@ -88,8 +89,8 @@ class AgoraPlugin(Plugin):
                         body=response, 
                         msgtype=MessageType.NOTICE,
                         relates_to=RelatesTo(rel_type=THREAD, event_id=evt.event_id))
-                await evt.respond(content, allow_html=True)  # Reply to user
-
-            # try to save a link to the message in the Agora.
-            for wikilink in wikilinks:
-                log_evt(evt, wikilink)
+                try:
+                    await evt.respond(content, allow_html=True)  # Reply to user
+                except errors.request.MUnknown: 
+                    # works around: "cannot start threads from an event with a relation"
+                    await evt.reply(response, allow_html=True)
