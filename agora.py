@@ -15,6 +15,9 @@ MATRIX_URL=f"https://develop.element.io"
 AGORA_ROOT=os.path.expanduser("~/agora")
 OUTPUT_DIR=f"{AGORA_ROOT}/stream/{AGORA_BOT_ID}"
 THREAD = RelationType("m.thread")
+HASHTAG_OPT_OUT_ROOMS = [
+        '!zPwMsygFdoMjtdrDfo:matrix.org',  # moa party 
+        ]
 
 class AgoraPlugin(Plugin):
     @command.passive("\[\[(.+?)\]\]", multiple=True)
@@ -59,6 +62,9 @@ class AgoraPlugin(Plugin):
 
     @command.passive(r'#(\S+)', multiple=True)
     async def hashtag_handler(self, evt: MessageEvent, subs: List[Tuple[str, str]]) -> None:
+        if evt.room_id in HASHTAG_OPT_OUT_ROOMS:
+            self.log.info(f"not handling hashtag due to opted out room: {evt.room_id}")
+            return
         await evt.mark_read()
         self.log.info(f"responding to event: {evt}")
         response = ""
